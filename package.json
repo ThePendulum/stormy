@@ -4,7 +4,9 @@
   "description": "Responsive front-end for Weewx.",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "webpack": "webpack --env=production --mode=production",
+    "webpack-dev": "webpack --env=development --mode=development",
+    "webpack-watch": "webpack --progress --colors --watch --env=development --mode=development"
   },
   "repository": {
     "type": "git",
@@ -21,5 +23,29 @@
   "bugs": {
     "url": "https://github.com/ThePendulum/stormy/issues"
   },
-  "homepage": "https://github.com/ThePendulum/stormy#readme"
+  "homepage": "https://github.com/ThePendulum/stormy#readme",
+  "dependencies": {
+    "vue": "^2.6.12"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.10.5",
+    "@babel/core": "^7.11.4",
+    "@babel/plugin-proposal-optional-chaining": "^7.11.0",
+    "@babel/preset-env": "^7.11.0",
+    "@babel/register": "^7.10.5",
+    "babel-eslint": "^10.1.0",
+    "babel-loader": "^8.1.0",
+    "css-loader": "^4.2.2",
+    "eslint": "^7.7.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-loader": "^4.0.2",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-vue": "^6.2.2",
+    "raw-loader": "^4.0.1",
+    "sass-loader": "^10.0.1",
+    "vue-loader": "^15.9.3",
+    "vue-template-compiler": "^2.6.12",
+    "webpack": "^5.0.0-beta.28",
+    "webpack-cli": "^3.3.12"
+  }
 }

@@ -1,0 +1,30 @@
+{
+    "root": true,
+    "extends": ["airbnb-base", "plugin:vue/recommended"],
+    "parserOptions": {
+        "parser": "babel-eslint",
+        "ecmaVersion": 2019,
+        "sourceType": "module"
+    },
+    "rules": {
+        "no-unused-vars": ["error", {"argsIgnorePattern": "^_"}],
+        "no-console": 0,
+        "indent": "off",
+        "template-curly-spacing": "off",
+        "max-len": [2, {
+            "code": 300,
+            "tabWidth": 4,
+            "ignoreUrls": true
+        }],
+        "vue/html-indent": ["error", 4],
+        "vue/multiline-html-element-content-newline": 0,
+        "vue/singleline-html-element-content-newline": 0,
+        "no-param-reassign": ["error", {
+            "props": true,
+            "ignorePropertyModificationsFor": ["state", "acc"]
+        }],
+    },
+    "globals": {
+        "CONFIG": true
+    }
+}
