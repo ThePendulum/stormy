@@ -1,5 +1,6 @@
 import path from 'path';
 import VueLoaderPlugin from 'vue-loader/lib/plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 
 export default {
     entry: './assets/js/main.js',
@@ -38,6 +39,7 @@ export default {
             {
                 test: /\.scss$/,
                 use: [
+                    MiniCssExtractPlugin.loader,
                     'css-loader?sourceMap',
                     'sass-loader?sourceMap',
                 ],
@@ -50,5 +52,8 @@ export default {
     },
     plugins: [
         new VueLoaderPlugin(),
+        new MiniCssExtractPlugin({
+            filename: '../css/style.css',
+        }),
     ],
 };
