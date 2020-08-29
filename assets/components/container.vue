@@ -3,6 +3,7 @@
         <h1>Weather</h1>
 
         <dl>
+            <dt>Time</dt><dd>{{ data.time }}</dd>
             <dt>Indoor temperature</dt><dd>{{ data.current.insideTemp.toFixed(1) }}°C</dd>
             <dt>Indoor humidity</dt><dd>{{ data.current.insideHumidity }}%</dd>
             <dt>Outdoor temperature</dt><dd>{{ data.current.temp.toFixed(1) }}°C</dd>
@@ -15,6 +16,7 @@
             :scroll-zoom="false"
             :display-mode-bar="false"
             :mode-bar-buttons-to-remove="['select2d', 'zoom2d']"
+            :responsive="true"
             class="graph"
         />
 
@@ -24,6 +26,7 @@
             :scroll-zoom="false"
             :display-mode-bar="false"
             :mode-bar-buttons-to-remove="['select2d', 'zoom2d']"
+            :responsive="true"
             class="graph"
         />
 
@@ -33,6 +36,7 @@
             :scroll-zoom="false"
             :display-mode-bar="false"
             :mode-bar-buttons-to-remove="['select2d', 'zoom2d']"
+            :responsive="true"
             class="graph"
         />
     </div>
@@ -42,7 +46,7 @@
 import { Plotly } from 'vue-plotly';
 
 async function mounted() {
-    const res = await fetch('./data.json');
+    const res = await fetch('./daily.json');
 
     if (!res.ok) {
         return;
@@ -67,6 +71,11 @@ async function mounted() {
     this.temp = [{
         x: data.day.map((day) => day.time),
         y: data.day.map((day) => day.temp),
+        name: 'Temperature',
+    }, {
+        x: data.day.map((day) => day.time),
+        y: data.day.map((day) => day.dewpoint),
+        name: 'Dew point',
     }];
 
     this.insideTemp = [{
@@ -93,6 +102,7 @@ export default {
                 },
                 yaxis: {
                     fixedrange: true,
+                    ticksuffix: '°C',
                 },
                 polar: {
                     // barmode: 'overlay',
@@ -117,7 +127,8 @@ export default {
 
 <style lang="scss" scoped>
 .graph {
-    width: 50rem;
+    width: 100%;
+    max-width: 50rem;
     height: 30rem;
 }
 </style>
