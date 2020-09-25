@@ -22,7 +22,7 @@
                     <Icon icon="droplet" />
 
                     <span class="section">
-                        <span class="value temp">{{ data.current.insideHumidity.toFixed(1) }}</span>
+                        <span class="value temp">{{ Math.round(data.current.insideHumidity) }}</span>
                         <span class="unit">%</span>
                     </span>
                 </span>
@@ -44,49 +44,97 @@
                     <Icon icon="droplet" />
 
                     <span class="section">
-                        <span class="value temp">{{ data.current.humidity.toFixed(1) }}</span>
+                        <span class="value temp">{{ Math.round(data.current.humidity) }}</span>
                         <span class="unit">%</span>
+                    </span>
+                </span>
+            </div>
+
+            <div class="tile wind">
+                <h3 class="tile-label">Wind<Icon icon="weather-windy" /></h3>
+
+                <span class="tile-info">
+                    <Icon icon="fan" />
+
+                    <span class="section">
+                        <span class="value temp">{{ data.current.windSpeed.toFixed(1) }}</span>
+                        <span class="unit">km/h</span>
+                    </span>
+                </span>
+
+                <span class="tile-info">
+                    <Icon
+                        icon="compass3"
+                        :style="{ transform: `rotate(${data.current.windDir - 45}deg)` }"
+                    />
+
+                    <span class="section">
+                        <span class="value temp">{{ data.current.windDirText }}</span>
+                        <span class="unit">{{ Math.round(data.current.windDir) }}°</span>
+                    </span>
+                </span>
+            </div>
+
+            <div class="tile rain">
+                <h3 class="tile-label">Rain<Icon icon="weather-rain" /></h3>
+
+                <span class="tile-info">
+                    <Icon icon="umbrella" />
+
+                    <span class="section">
+                        <span class="value temp">{{ data.current.rainRate.toFixed(2) }}</span>
+                        <span class="unit">cm/h</span>
+                    </span>
+                </span>
+
+                <span class="tile-info">
+                    <Icon icon="bucket2" />
+
+                    <span class="section">
+                        <span class="value temp">{{ data.current.rainToday.toFixed(2) }}</span>
+                        <span class="unit">cm</span>
+                    </span>
+                </span>
+            </div>
+
+            <div class="tile sun">
+                <h3 class="tile-label">Sun<Icon icon="sun" /></h3>
+
+                <span class="tile-info">
+                    <Icon icon="weather-cloud-sun" />
+
+                    <span class="section">
+                        <span class="value temp">{{ data.current.solarRadiation.toFixed(1) }}</span>
+                        <span class="unit">W/m²</span>
+                    </span>
+                </span>
+
+                <span class="tile-info">
+                    <Icon icon="sun3" />
+
+                    <span class="section">
+                        <span class="value temp">{{ data.current.UV.toFixed(1) }}</span>
+                        <span class="unit">idx</span>
                     </span>
                 </span>
             </div>
         </div>
 
-        <!--
-        <Plotly
-            :data="wind"
-            :layout="layout"
-            :scroll-zoom="false"
-            :display-mode-bar="false"
-            :mode-bar-buttons-to-remove="['select2d', 'zoom2d']"
-            :responsive="true"
-            class="graph"
-        />
-
-        <Plotly
-            :data="insideTemp"
-            :layout="layout"
-            :scroll-zoom="false"
-            :display-mode-bar="false"
-            :mode-bar-buttons-to-remove="['select2d', 'zoom2d']"
-            :responsive="true"
-            class="graph"
-        />
-
-        <Plotly
-            :data="temp"
-            :layout="layout"
-            :scroll-zoom="false"
-            :display-mode-bar="false"
-            :mode-bar-buttons-to-remove="['select2d', 'zoom2d']"
-            :responsive="true"
-            class="graph"
-        />
-        -->
+        <div class="charts">
+            <div class="chart">
+                <LineChart
+                    :data="temp"
+                    :options="chartOptions"
+                />
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
-// import { Plotly } from 'vue-plotly';
+// import dayjs from 'dayjs';
+
+import LineChart from './line-chart.vue';
 
 async function mounted() {
     const res = await fetch('./daily.json');
@@ -98,67 +146,44 @@ async function mounted() {
     const data = await res.json();
     this.data = data;
 
-    this.wind = [{
-        r: data.day.map((day) => day.windSpeed),
-        theta: data.day.map((day) => day.windDir),
-        text: data.day.map((day) => day.time),
-        mode: 'markers',
-        marker: {
-            color: data.day.map((day) => day.windSpeed),
-            colorscale: 'Portland',
-            size: 10,
-        },
-        type: 'scatterpolar',
-    }];
-
-    this.temp = [{
-        x: data.day.map((day) => day.time),
-        y: data.day.map((day) => day.temp),
-        name: 'Temperature',
-    }, {
-        x: data.day.map((day) => day.time),
-        y: data.day.map((day) => day.dewpoint),
-        name: 'Dew point',
-    }];
-
-    this.insideTemp = [{
-        x: data.day.map((day) => day.time),
-        y: data.day.map((day) => day.insideTemp),
-    }];
-
-    console.log(data.day);
+    this.temp = {
+        datasets: [
+            {
+                label: 'Outdoor Temperature',
+                borderColor: '#8ba',
+                data: this.data.day.map((day) => ({
+                    x: day.time,
+                    y: day.temp,
+                })),
+            },
+            {
+                label: 'Dew Point',
+                borderColor: '#a8b',
+                data: this.data.day.map((day) => ({
+                    x: day.time,
+                    y: day.dewpoint,
+                })),
+            },
+        ],
+    };
 }
 
 export default {
     components: {
-        // Plotly,
+        LineChart,
     },
     data() {
         return {
             data: null,
-            wind: null,
-            insideTemp: null,
             temp: null,
-            layout: {
-                xaxis: {
-                    fixedrange: true,
+            chartOptions: {
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 0,
                 },
-                yaxis: {
-                    fixedrange: true,
-                    ticksuffix: '°C',
-                },
-                polar: {
-                    // barmode: 'overlay',
-                    radialaxis: {
-                        dtick: 1,
-                        ticksuffix: 'km/h',
-                    },
-                    angularaxis: {
-                        // categoryarray: ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'],
-                        tickvals: [0, 22.5, 45, 67.5, 90, 112.5, 135, 157.5, 180, 202.5, 225, 247.5, 270, 292.5, 315, 337.5],
-                        ticktext: ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'],
-                        rotation: 90,
-                        direction: 'clockwise',
+                elements: {
+                    line: {
+                        fill: false,
                     },
                 },
             },
@@ -181,7 +206,7 @@ export default {
     .detail {
         display: flex;
         align-items: center;
-        margin: 0 0 .5rem 0;
+        margin: 0 0 1rem 0;
         color: var(--shadow);
         font-size: .9rem;
         font-weight: bold;
@@ -189,7 +214,7 @@ export default {
 
     .icon {
         fill: var(--shadow);
-        margin: 0 .5rem 0 0;
+        margin: -.2rem 1rem 0 0;
     }
 }
 
@@ -198,6 +223,7 @@ export default {
     grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
     grid-gap: 1rem;
     padding: 1rem;
+    margin: 0 0 1rem 0;
 }
 
 .tile {
@@ -206,7 +232,6 @@ export default {
     flex-direction: column;
     padding: 0 0 .5rem 0;
     align-items: center;
-    justify-content: center;
     box-shadow: 0 0 3px var(--shadow-weak);
 }
 
@@ -219,14 +244,14 @@ export default {
     padding: .75rem 1rem;
     margin: 0 0 .5rem 0;
     background: var(--shadow-hint);
-    color: var(--highlight-strong);
+    color: var(--highlight-extreme);
     font-size: 1rem;
     font-weight: bold;
 
     .icon {
         width: 1rem;
         height: 1rem;
-        fill: var(--highlight-strong);
+        fill: var(--highlight-extreme);
     }
 }
 
@@ -245,10 +270,11 @@ export default {
 
     .value {
         color: var(--text-light);
-        font-size: 2.5rem;
+        font-size: 2rem;
     }
 
     .unit {
+        width: 2rem;
         margin: .25rem 0 0 .25rem;
         color: var(--highlight);
         font-weight: bold;
@@ -257,8 +283,17 @@ export default {
     .icon {
         width: 1.25rem;
         height: 1.25rem;
-        margin: 0 1.5rem 0 0;
+        margin: 0 1rem 0 0;
         fill: var(--highlight-strong);
     }
+}
+
+.charts {
+    padding: 1rem;
+}
+
+.chart {
+    width: 40rem;
+    height: 20rem;
 }
 </style>

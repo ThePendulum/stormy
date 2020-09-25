@@ -9,20 +9,21 @@
 .header .detail[data-v-2d724db6] {
     display: flex;
     align-items: center;
-    margin: 0 0 .5rem 0;
+    margin: 0 0 1rem 0;
     color: var(--shadow);
     font-size: .9rem;
     font-weight: bold;
 }
 .header .icon[data-v-2d724db6] {
     fill: var(--shadow);
-    margin: 0 .5rem 0 0;
+    margin: -.2rem 1rem 0 0;
 }
 .tiles[data-v-2d724db6] {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
   grid-gap: 1rem;
   padding: 1rem;
+  margin: 0 0 1rem 0;
 }
 .tile[data-v-2d724db6] {
   background: var(--primary);
@@ -30,7 +31,6 @@
   flex-direction: column;
   padding: 0 0 .5rem 0;
   align-items: center;
-  justify-content: center;
   box-shadow: 0 0 3px var(--shadow-weak);
 }
 .tile-label[data-v-2d724db6] {
@@ -42,14 +42,14 @@
   padding: .75rem 1rem;
   margin: 0 0 .5rem 0;
   background: var(--shadow-hint);
-  color: var(--highlight-strong);
+  color: var(--highlight-extreme);
   font-size: 1rem;
   font-weight: bold;
 }
 .tile-label .icon[data-v-2d724db6] {
     width: 1rem;
     height: 1rem;
-    fill: var(--highlight-strong);
+    fill: var(--highlight-extreme);
 }
 .tile-info[data-v-2d724db6] {
   width: 100%;
@@ -65,9 +65,10 @@
 }
 .tile-info .value[data-v-2d724db6] {
     color: var(--text-light);
-    font-size: 2.5rem;
+    font-size: 2rem;
 }
 .tile-info .unit[data-v-2d724db6] {
+    width: 2rem;
     margin: .25rem 0 0 .25rem;
     color: var(--highlight);
     font-weight: bold;
@@ -75,8 +76,15 @@
 .tile-info .icon[data-v-2d724db6] {
     width: 1.25rem;
     height: 1.25rem;
-    margin: 0 1.5rem 0 0;
+    margin: 0 1rem 0 0;
     fill: var(--highlight-strong);
+}
+.charts[data-v-2d724db6] {
+  padding: 1rem;
+}
+.chart[data-v-2d724db6] {
+  width: 40rem;
+  height: 20rem;
 }
 
 .icon {
@@ -94,6 +102,8 @@
   --primary: #8ab;
   --text: #222;
   --text-light: #fafafa;
+  /* --background: #fafcff; */
+  --background: #f0f1f2;
   --shadow: rgba(0, 0, 0, .5);
   --shadow-extreme: rgba(0, 0, 0, .9);
   --shadow-strong: rgba(0, 0, 0, .7);
@@ -111,5 +121,7 @@ body {
 
 body {
   margin: 0;
+  color: var(--text);
+  background: var(--background);
   font-family: Verdana, sans-serif; }
 
