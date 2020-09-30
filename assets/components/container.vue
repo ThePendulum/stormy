@@ -65,12 +65,13 @@
                 <span class="tile-info">
                     <Icon
                         icon="compass3"
+                        class="disabled"
                         :style="{ transform: `rotate(${data.current.windDir - 45}deg)` }"
                     />
 
                     <span class="section">
-                        <span class="value temp">{{ data.current.windDirText }}</span>
-                        <span class="unit">{{ Math.round(data.current.windDir) }}°</span>
+                        <span class="value temp">{{ data.current.windDirText || 'N/A' }}</span>
+                        <span class="unit">{{ data.current.windDir === null ? 'N/A' : Math.round(data.current.windDir) }}°</span>
                     </span>
                 </span>
             </div>
@@ -123,8 +124,22 @@
         <div class="charts">
             <div class="chart">
                 <LineChart
-                    :data="temp"
-                    :options="chartOptions"
+                    :datasets="temp.datasets"
+                    :options="temp.options"
+                />
+            </div>
+
+            <div class="chart">
+                <BarChart
+                    :datasets="rain.datasets"
+                    :options="rain.options"
+                />
+            </div>
+
+            <div class="chart">
+                <LineChart
+                    :datasets="wind.datasets"
+                    :options="wind.options"
                 />
             </div>
         </div>
@@ -134,7 +149,20 @@
 <script>
 // import dayjs from 'dayjs';
 
+import BarChart from './bar-chart.vue';
 import LineChart from './line-chart.vue';
+
+const timeAxis = {
+    type: 'time',
+    format: 'HH:mm',
+    time: {
+        unit: 'hour',
+        displayFormats: {
+            minute: 'HH:mm',
+            hour: 'HH:mm',
+        },
+    },
+};
 
 async function mounted() {
     const res = await fetch('./daily.json');
@@ -147,10 +175,27 @@ async function mounted() {
     this.data = data;
 
     this.temp = {
+        options: {
+            ...this.chartOptions,
+            tooltips: {
+                callbacks: {
+                    label: (item) => `${item.yLabel.toFixed(2)} °C`,
+                },
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        callback: (value) => `${value} °C`,
+                    },
+                }],
+                xAxes: [timeAxis],
+            },
+        },
         datasets: [
             {
                 label: 'Outdoor Temperature',
                 borderColor: '#8ba',
+                backgroundColor: '#8ba',
                 data: this.data.day.map((day) => ({
                     x: day.time,
                     y: day.temp,
@@ -159,9 +204,82 @@ async function mounted() {
             {
                 label: 'Dew Point',
                 borderColor: '#a8b',
+                backgroundColor: '#a8b',
                 data: this.data.day.map((day) => ({
                     x: day.time,
                     y: day.dewpoint,
+                })),
+            },
+        ],
+    };
+
+    this.rain = {
+        options: {
+            ...this.chartOptions,
+            tooltips: {
+                callbacks: {
+                    label: (item) => `${item.yLabel.toFixed(2)} cm`,
+                },
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        callback: (value) => `${value.toFixed(2)} cm`,
+                    },
+                }],
+                xAxes: [timeAxis],
+            },
+        },
+        datasets: [
+            {
+                label: 'Rain',
+                backgroundColor: '#8ab',
+                data: this.data.day.map((day) => ({
+                    x: day.time,
+                    y: day.rain,
+                })),
+            },
+        ],
+    };
+
+    this.wind = {
+        options: {
+            ...this.chartOptions,
+            tooltips: {
+                callbacks: {
+                    label: (item) => `${item.yLabel.toFixed(2)} km/h`,
+                },
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        callback: (value) => `${value.toFixed(2)} km/h`,
+                    },
+                }],
+                xAxes: [timeAxis],
+            },
+        },
+        datasets: [
+            {
+                label: 'Wind Speed',
+                borderColor: '#8ba',
+                backgroundColor: '#8ba',
+                lineTension: 0.2,
+                data: this.data.day.map((day) => ({
+                    x: day.time,
+                    y: day.windSpeed,
+                })),
+            },
+            {
+                label: 'Gust Speed',
+                backgroundColor: 'rgba(255, 150, 220, 0.1)',
+                pointBackgroundColor: '#b8a',
+                borderColor: 'rgba(187, 136, 170, 0.5)',
+                lineTension: 0.2,
+                fill: true,
+                data: this.data.day.map((day) => ({
+                    x: day.time,
+                    y: day.windGust,
                 })),
             },
         ],
@@ -170,6 +288,7 @@ async function mounted() {
 
 export default {
     components: {
+        BarChart,
         LineChart,
     },
     data() {
@@ -177,11 +296,16 @@ export default {
             data: null,
             temp: null,
             chartOptions: {
+                responsive: true,
                 maintainAspectRatio: false,
                 animation: {
                     duration: 0,
                 },
                 elements: {
+                    point: {
+                        radius: 3,
+                        hoverRadius: 5,
+                    },
                     line: {
                         fill: false,
                     },
@@ -220,7 +344,7 @@ export default {
 
 .tiles {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
     grid-gap: 1rem;
     padding: 1rem;
     margin: 0 0 1rem 0;
@@ -274,10 +398,11 @@ export default {
     }
 
     .unit {
-        width: 2rem;
-        margin: .25rem 0 0 .25rem;
+        width: 2.5rem;
+        margin: .3rem 0 0 .5rem;
         color: var(--highlight);
         font-weight: bold;
+        text-align: right;
     }
 
     .icon {
@@ -285,15 +410,22 @@ export default {
         height: 1.25rem;
         margin: 0 1rem 0 0;
         fill: var(--highlight-strong);
+
+        &.disabled {
+            fill: var(--highlight-weak);
+        }
     }
 }
 
 .charts {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(40rem, 1fr));
+    grid-gap: 2rem 4rem;
     padding: 1rem;
 }
 
 .chart {
-    width: 40rem;
-    height: 20rem;
+    width: 100%;
+    height: 25rem;
 }
 </style>

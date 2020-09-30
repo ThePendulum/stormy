@@ -1,12 +1,12 @@
 <script>
-import { Line } from 'vue-chartjs';
+import { Bar } from 'vue-chartjs';
 
 function mounted() {
     this.renderChart({ ...this.data, datasets: this.datasets || this.data.datasets }, this.options);
 }
 
 export default {
-    extends: Line,
+    extends: Bar,
     props: {
         data: {
             type: Object,
