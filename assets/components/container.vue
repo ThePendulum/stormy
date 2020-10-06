@@ -65,8 +65,10 @@
                 <span class="tile-info">
                     <Icon
                         icon="compass3"
-                        class="disabled"
-                        :style="{ transform: `rotate(${data.current.windDir - 45}deg)` }"
+                        :style="{
+                            transform: `rotate(${data.current.windDir - 45}deg)`,
+                            disabled: data.current.windSpeed === 0
+                        }"
                     />
 
                     <span class="section">
@@ -427,5 +429,11 @@ export default {
 .chart {
     width: 100%;
     height: 25rem;
+}
+
+@media(max-width: 700px) {
+    .charts {
+        grid-template-columns: minmax(10rem, 1fr);
+    }
 }
 </style>
